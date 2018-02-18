@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,12 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.apache.commons.lang3.StringUtils;
+
 @Controller
 public class LogFileController {
 
 	@GetMapping("/")
-	public String homepage() {
-
+	public String homepage(Model model) {
+		model.addAttribute("display", "none");
 		return "homepage";
 	}
 
@@ -28,6 +29,7 @@ public class LogFileController {
 	public String processLogFile(@RequestParam("file") MultipartFile file, Model model) throws IllegalStateException, IOException {
 		Map<String, Integer> occurances = new HashMap<>();// this is a map of all the viewers and the number of items they visited the page
 		Scanner logFile = null;
+		int totalViews = 0;
 		try {
 			logFile = new Scanner(file.getInputStream());
 			while (logFile.hasNextLine()) {// every line corresponds to another session (visit)
@@ -36,6 +38,7 @@ public class LogFileController {
 				// inside the (), which ends up being the name of our people
 				java.util.regex.Matcher match = p.matcher(sentence); // for every math, we only retrieve the "first group" (\\w+)
 				if (match.find()) {
+					totalViews++;
 					String nameString = match.group(1);// "first group" (\\w+)
 					if (!occurances.containsKey(nameString)) { // first addition to our map
 						occurances.put(nameString, new Integer(1));
@@ -52,9 +55,11 @@ public class LogFileController {
 		// this is to filter by values and then only show the top 10 users.
 		Map<String, Integer> finalNames = new LinkedHashMap<>();// LinkedHashMaps are FIFO
 				occurances.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-						.limit(10).forEach(s-> finalNames.put(s.getKey(),s.getValue()));
+						.limit(10).forEach(s-> finalNames.put(StringUtils.capitalize(s.getKey()),s.getValue()));
 						//.collect(Collectors.toMap(s -> StringUtils.capitalize((String) s.getKey()), s -> (Integer) s.getValue())));
 		model.addAttribute("data", finalNames);
+		model.addAttribute("display", "initial");
+		////// Chart stuff ////////
 		return "homepage";
 	}
 }
