@@ -30,7 +30,7 @@
 	<h1 class= "center">-------Tarun Sunkaraneni's Log File User Analyzer--------</h1>
 	<div class="center">
 		<form method="POST" enctype="multipart/form-data" action="/">
-		<h2> Upload your file here:</h2>
+		<h2> Upload your file here:<p><a href="/log/log.log">Sample Log File</a></p></h2>
 			<table align="center">
 				<tr><td></td><td><input type="file" name="file" /></td></tr>
 				<tr><td></td><td><input type="submit" value="Upload" /></td></tr>
